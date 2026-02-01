@@ -1,7 +1,7 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
-import pandas as pd
+import pandas as pdx
 from datetime import datetime
 import os
 import sys
@@ -14,7 +14,7 @@ now = datetime.now()
 month_day_year = now.strftime("%m%d%Y")
 
 web = 'https://www.thesun.co.uk/sport/football/'
-path = '/Users/frankandrade/Downloads/chromedriver'  # introduce path here
+path = 'C:\Users\Admin\Downloads\chromedriver_win32\chromedriver.exe'  # introduce path here
 
 # Headless mode
 options = Options()
