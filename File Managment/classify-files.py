@@ -52,5 +52,4 @@ while True:
     for filename in new_files:
         classify_file(filename)
 
-    # Update the initial list of files
     initial_files = current_files
