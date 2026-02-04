@@ -2,10 +2,10 @@ import jinja2
 import pdfkit
 from datetime import datetime
 
-client_name = "Frank Andrade"
-item1 = "TV"
-item2 = "Couch"
-item3 = "Washing Machine"
+client_name = "Sachin Gunjal"
+item1 = "Wifi"
+item2 = "Laptop"
+item3 = "Bag"
 
 subtotal1 = 499
 subtotal2 = 399
@@ -28,6 +28,6 @@ html_template = 'invoice.html'
 template = template_env.get_template(html_template)
 output_text = template.render(context)
 
-config = pdfkit.configuration(wkhtmltopdf='/usr/local/bin/wkhtmltopdf')
+config = pdfkit.configuration(wkhtmltopdf=r"C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe")
 output_pdf = 'invoice.pdf'
 pdfkit.from_string(output_text, output_pdf, configuration=config, css='invoice.css')

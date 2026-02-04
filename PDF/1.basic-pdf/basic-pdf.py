@@ -2,7 +2,7 @@ import jinja2
 import pdfkit
 from datetime import datetime
 
-my_name = "Frank Andrade"
+my_name = "Sachin Gunjal"
 item1 = "TV"
 item2 = "Couch"
 item3 = "Washing Machine"
@@ -18,6 +18,6 @@ html_template = 'basic-template.html'
 template = template_env.get_template(html_template)
 output_text = template.render(context)
 
-config = pdfkit.configuration(wkhtmltopdf='/usr/local/bin/wkhtmltopdf')
+config = pdfkit.configuration(wkhtmltopdf=r"C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe")
 output_pdf = 'pdf_generated.pdf'
 pdfkit.from_string(output_text, output_pdf, configuration=config, css='style.css')
