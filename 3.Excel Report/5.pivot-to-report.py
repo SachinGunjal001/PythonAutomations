@@ -2,46 +2,72 @@ from openpyxl import load_workbook
 from openpyxl.chart import BarChart, Reference
 from openpyxl.utils import get_column_letter
 from openpyxl.styles import Font
+import os
 
-# Putting together #2, #3, and #4 (input: pivot_table.xlsx + month , output: Report with barchart, formulas and format)
-month = 'february'
+# Config
+month = input("Enter Month Name: ")
 
-# Read workbook and select sheet
-wb = load_workbook('pivot_table.xlsx')
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+INPUT_FILE = os.path.join(BASE_DIR, "pivot_table.xlsx")
+OUTPUT_FILE = os.path.join(BASE_DIR, f"report_{month}.xlsx")
+
+# Load workbook
+wb = load_workbook(INPUT_FILE)
 sheet = wb['Report']
 
 # Active rows and columns
-min_column = wb.active.min_column
-max_column = wb.active.max_column
-min_row = wb.active.min_row
-max_row = wb.active.max_row
+min_column = sheet.min_column
+max_column = sheet.max_column
+min_row = sheet.min_row
+max_row = sheet.max_row
 
-# Instantiate a barchart
+# Bar chart
+# 
 barchart = BarChart()
 
-# Locate data and categories
-data = Reference(sheet, min_col=min_column+1, max_col=max_column, min_row=min_row, max_row=max_row)  # including headers
-categories = Reference(sheet, min_col=min_column, max_col=min_column, min_row=min_row+1, max_row=max_row)  # not including headers
+data = Reference(
+    sheet,
+    min_col=min_column + 1,
+    max_col=max_column,
+    min_row=min_row,
+    max_row=max_row
+)
 
-# Adding data and categories
+categories = Reference(
+    sheet,
+    min_col=min_column,
+    min_row=min_row + 1,
+    max_row=max_row
+)
+
 barchart.add_data(data, titles_from_data=True)
 barchart.set_categories(categories)
 
-# Make chart
-sheet.add_chart(barchart, "B12")
 barchart.title = 'Sales by Product line'
-barchart.style = 5  # choose the chart style
+barchart.style = 5
 
-# Write multiple formulas with a for loop
-for i in range(min_column+1, max_column+1):  # (B, G+1)
-    letter = get_column_letter(i)
-    sheet[f'{letter}{max_row + 1}'] = f'=SUM({letter}{min_row + 1}:{letter}{max_row})'
-    sheet[f'{letter}{max_row + 1}'].style = 'Currency'
+sheet.add_chart(barchart, "B12")
 
-# Add format
+# 
+# Totals row (formulas)
+# 
+for i in range(min_column + 1, max_column + 1):
+    col_letter = get_column_letter(i)
+    cell = f'{col_letter}{max_row + 1}'
+    sheet[cell] = f'=SUM({col_letter}{min_row + 1}:{col_letter}{max_row})'
+    sheet[cell].style = 'Currency'
+
+# 
+# Header formatting
+# 
 sheet['A1'] = 'Sales Report'
-sheet['A2'] = month
+sheet['A2'] = month.capitalize()
 sheet['A1'].font = Font('Arial', bold=True, size=20)
 sheet['A2'].font = Font('Arial', bold=True, size=10)
 
-wb.save(f'report_{month}.xlsx')
+# 
+# Save output
+# 
+wb.save(OUTPUT_FILE)
+
+print("Report generated successfully.")
