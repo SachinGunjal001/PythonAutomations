@@ -1,33 +1,63 @@
 import jinja2
 import pdfkit
 from datetime import datetime
+import os
 
+# -----------------------
+# Paths (ABSOLUTE)
+# -----------------------
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+HTML_TEMPLATE = os.path.join(BASE_DIR, "invoice.html")
+CSS_FILE = os.path.join(BASE_DIR, "invoice.css")
+OUTPUT_PDF = os.path.join(BASE_DIR, "invoice.pdf")
+
+WKHTMLTOPDF_PATH = r"C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe"
+
+# -----------------------
+# Data
+# -----------------------
 client_name = "Sachin Gunjal"
-item1 = "Wifi"
-item2 = "Laptop"
-item3 = "Bag"
 
-subtotal1 = 499
-subtotal2 = 399
-subtotal3 = 129
-total = subtotal1 + subtotal2 + subtotal3
+items = [
+    ("Wifi", 499),
+    ("Laptop", 399),
+    ("Bag", 129)
+]
+
+total = sum(item[1] for item in items)
 
 today_date = datetime.today().strftime("%d %b, %Y")
 month = datetime.today().strftime("%B")
 
-context = {'client_name': client_name, 'today_date': today_date, 'total': f'${total:.2f}', 'month': month,
-           'item1': item1, 'subtotal1': f'${subtotal1:.2f}',
-           'item2': item2, 'subtotal2': f'${subtotal2:.2f}',
-           'item3': item3, 'subtotal3': f'${subtotal3:.2f}'
-           }
+context = {
+    "client_name": client_name,
+    "today_date": today_date,
+    "month": month,
+    "items": items,
+    "total": f"${total:.2f}"
+}
 
-template_loader = jinja2.FileSystemLoader('./')
-template_env = jinja2.Environment(loader=template_loader)
+# -----------------------
+# Jinja2 Rendering
+# -----------------------
+env = jinja2.Environment(
+    loader=jinja2.FileSystemLoader(BASE_DIR),
+    autoescape=True
+)
 
-html_template = 'invoice.html'
-template = template_env.get_template(html_template)
-output_text = template.render(context)
+template = env.get_template("invoice.html")
+html_output = template.render(context)
 
-config = pdfkit.configuration(wkhtmltopdf=r"C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe")
-output_pdf = 'invoice.pdf'
-pdfkit.from_string(output_text, output_pdf, configuration=config, css='invoice.css')
+# -----------------------
+# PDF Generation
+# -----------------------
+config = pdfkit.configuration(wkhtmltopdf=WKHTMLTOPDF_PATH)
+
+pdfkit.from_string(
+    html_output,
+    OUTPUT_PDF,
+    configuration=config,
+    css=CSS_FILE
+)
+
+print("Invoice PDF generated successfully.")
